@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Templado simulado</title>
+    <!-- Agrega el enlace a Bootstrap CSS -->
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+    <style>
+      body {
+        background-color: #000000; /* Cambia el color de fondo a negro */
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; /* Fuente */
+        color: white; /* Cambia el color del texto a blanco */
+      }
+      .container {
+        text-align: center; /* Centra el contenido en el contenedor */
+      }
+      #generarRuta {
+        background-color: #ffc107; /* Cambia el color del botón a amarillo */
+        border-color: #ffc107; /* Cambia el color del borde del botón a amarillo */
+        color: black; /* Establece el color del texto en negro */
+      }
+      .table-container {
+        display: flex; /* Utiliza el modelo de caja flexible para alinear elementos en una fila */
+        justify-content: space-between; /* Espaciado uniforme entre los elementos flexibles */
+      }
+      .table-container .table {
+        width: 60%; /* Ancho del 60% para cada tabla */
+      }
+      .table th,
+      .table td {
+        color: white; /* Cambia el color del texto en el encabezado y el cuerpo de la tabla a blanco */
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container mt-4">
+      <h4>Templado simulado</h4>
+      <button id="generarRuta" class="btn btn-warning">Generar ruta</button>
+      <div class="mt-4">
+        <!-- Contenedor para las tablas -->
+        <div class="table-container">
+          <!-- Tabla para la mejor ruta y distancia -->
+          <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">Mejor Ruta</th>
+                <th scope="col">Distancia Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td id="mejorRuta"></td>
+                <td id="distanciaTotal"></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Tabla para las rutas generadas -->
+          <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">Resultado</th>
+                <th scope="col">Mejor Ruta</th>
+                <th scope="col">Distancia Total</th>
+              </tr>
+            </thead>
+            <tbody id="resultadosContainer"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let resultadoCount = 1; // Variable para llevar un registro de los resultados
+
+      document
+        .getElementById("generarRuta")
+        .addEventListener("click", function () {
+          fetch("/generar_ruta", { method: "POST" })
+            .then((response) => response.json())
+            .then((data) => {
+              let mejorRuta = document.getElementById("mejorRuta");
+              let distanciaTotal = document.getElementById("distanciaTotal");
+              let resultadosContainer = document.getElementById(
+                "resultadosContainer"
+              );
+
+              // Actualiza los campos de la mejor ruta y distancia en la tabla
+              mejorRuta.textContent = data.mejor_ruta.join(" -> ");
+              distanciaTotal.textContent = data.distancia_total.toFixed(2);
+
+              // Crea una nueva fila en la tabla de resultados para mostrar los detalles
+              let nuevaFila = document.createElement("tr");
+              nuevaFila.innerHTML = `
+                    <td>${resultadoCount}</td>
+                    <td>${data.mejor_ruta.join(" , ")}</td>
+                    <td>${data.distancia_total.toFixed(2)}</td>
+                `;
+              resultadosContainer.appendChild(nuevaFila);
+
+              resultadoCount++; // Incrementa el contador de resultados
+            });
+        });
+    </script>
+  </body>
+</html>
